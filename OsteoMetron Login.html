@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>OsteoMetron — Přihlášení</title>
+    <meta name="description" content="OsteoMetron — výukový offline nástroj pro měření úhlů a plánování osteotomie na RTG snímcích.">
+    <meta name="theme-color" content="#1e5b82">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="OsteoMetron">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="OsteoMetron — Učební nástroj pro osteotomii">
+    <meta property="og:description" content="Měření úhlů a plánování korekčních osteotomií na RTG snímcích. Offline, soukromé, výukové.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="./icons/icon-512.png">
+
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <link rel="alternate icon" type="image/png" href="./icons/icon-192.png">
+    <link rel="apple-touch-icon" href="./icons/icon-180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="./icons/icon-152.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="./icons/icon-120.png">
+    <link rel="manifest" href="./manifest.json">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f4f6f8;
+            --surface: #ffffff;
+            --surface-muted: #fafbfc;
+            --border: #e4e8ec;
+            --border-strong: #d6dde2;
+            --text: #10242f;
+            --text-muted: #5b6f7c;
+            --text-subtle: #8c9aa4;
+            --accent: #1e5b82;
+            --accent-strong: #164865;
+            --accent-soft: #e8f1f7;
+            --accent-border: #c6dbea;
+            --danger: #b8465a;
+            --danger-soft: #fceff2;
+            --radius-sm: 6px;
+            --radius: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 2px rgba(16,36,47,0.06);
+            --shadow: 0 4px 12px rgba(16,36,47,0.08);
+            --shadow-lg: 0 16px 48px rgba(16,36,47,0.18);
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        .page {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1.05fr 1fr;
+        }
+
+        /* LEFT PANE — branding */
+        .brand-pane {
+            position: relative;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 56px 64px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .brand-pane::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(to right, rgba(30,91,130,0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(30,91,130,0.04) 1px, transparent 1px);
+            background-size: 32px 32px;
+            mask-image: radial-gradient(ellipse at 70% 40%, #000 0%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse at 70% 40%, #000 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .brand-pane > * { position: relative; z-index: 1; }
+
+        .brand-top { display: flex; align-items: center; gap: 14px; }
+        .brand-mark {
+            width: 48px; height: 48px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .brand-mark svg { width: 100%; height: 100%; }
+        .brand-text h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); margin: 0; }
+        .brand-text h1 .brand-metron { font-weight: 400; color: var(--accent); }
+        .brand-text p { font-size: 12px; color: var(--text-muted); margin: 2px 0 0 0; }
+
+        .hero {
+            max-width: 520px;
+            margin: 80px 0;
+        }
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 11px;
+            background: var(--accent-soft);
+            border: 1px solid var(--accent-border);
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 24px;
+        }
+        .eyebrow-dot {
+            width: 6px; height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+        .hero h2 {
+            font-size: 38px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+            color: var(--text);
+            margin-bottom: 16px;
+            text-wrap: balance;
+        }
+        .hero h2 em {
+            font-style: normal;
+            color: var(--accent);
+        }
+        .hero p {
+            font-size: 14.5px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            text-wrap: pretty;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-top: 28px;
+            display: grid;
+            gap: 12px;
+        }
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--text);
+            font-weight: 500;
+        }
+        .feature-list li svg {
+            flex-shrink: 0;
+            margin-top: 2px;
+            color: var(--accent);
+        }
+        .feature-list li span {
+            color: var(--text-muted);
+            font-weight: 400;
+            display: block;
+            font-size: 12.5px;
+            margin-top: 1px;
+        }
+
+        .brand-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11.5px;
+            color: var(--text-subtle);
+        }
+        .brand-footer .meta {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
+        .brand-footer .meta a {
+            color: var(--text-subtle);
+            text-decoration: none;
+        }
+        .brand-footer .meta a:hover { color: var(--text-muted); }
+        .version-tag {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 3px 8px;
+            background: var(--surface-muted);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+        }
+
+        /* RIGHT PANE — login */
+        .auth-pane {
+            background: var(--bg);
+            padding: 56px 64px 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .auth-top {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+        }
+        .lang-switcher { display: flex; gap: 2px; padding: 3px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+        .lang-btn { min-width: 36px; padding: 5px 10px; border: none; background: transparent; color: var(--text-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.02em; border-radius: 5px; cursor: pointer; font-family: var(--font); transition: all 0.15s ease; }
+        .lang-btn:hover { color: var(--text); }
+        .lang-btn.active { background: var(--accent-soft); color: var(--accent); }
+
+        .auth-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 420px;
+        }
+        .auth-card > h3 {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.015em;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .auth-card > p.lead {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 3px;
+            margin-bottom: 22px;
+        }
+        .tab {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 12.5px;
+            font-weight: 500;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: all 0.15s ease;
+        }
+        .tab:hover { color: var(--text); }
+        .tab.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-row { margin-bottom: 14px; }
+        .form-row label {
+            display: block;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-wrap svg.input-icon {
+            position: absolute;
+            left: 12px;
+            color: var(--text-subtle);
+            pointer-events: none;
+        }
+        .form-row input[type="email"],
+        .form-row input[type="password"],
+        .form-row input[type="text"] {
+            width: 100%;
+            padding: 11px 12px 11px 38px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface);
+            font-family: var(--font);
+            font-size: 13.5px;
+            color: var(--text);
+            transition: all 0.15s ease;
+        }
+        .form-row input::placeholder { color: var(--text-subtle); }
+        .form-row input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+
+        .pw-toggle {
+            position: absolute;
+            right: 8px;
+            background: transparent;
+            border: none;
+            padding: 6px;
+            color: var(--text-subtle);
+            cursor: pointer;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pw-toggle:hover { color: var(--text-muted); background: var(--surface-muted); }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 6px 0 22px 0;
+        }
+        .check {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+            color: var(--text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+        .check input {
+            width: 15px; height: 15px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+        .forgot {
+            font-size: 12.5px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .forgot:hover { text-decoration: underline; }
+
+        .submit {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--accent);
+            color: #fff;
+            border: 1px solid var(--accent);
+            border-radius: var(--radius);
+            font-family: var(--font);
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .submit:hover { background: var(--accent-strong); border-color: var(--accent-strong); }
+        .submit:disabled { opacity: 0.6; cursor: wait; }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 22px 0;
+            color: var(--text-subtle);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .sso-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .sso-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 12.5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .sso-btn:hover { background: var(--surface-muted); border-color: var(--border-strong); }
+
+        .legal {
+            margin-top: 28px;
+            font-size: 11.5px;
+            color: var(--text-subtle);
+            line-height: 1.6;
+            text-align: center;
+        }
+        .legal a { color: var(--text-muted); text-decoration: underline; text-decoration-color: var(--border-strong); text-underline-offset: 2px; }
+        .legal a:hover { color: var(--text); }
+
+        .notice {
+            margin-top: 22px;
+            padding: 12px 14px;
+            background: var(--accent-soft);
+            border: 1px solid var(--accent-border);
+            border-radius: var(--radius);
+            font-size: 12px;
+            color: var(--accent-strong);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .notice svg { flex-shrink: 0; margin-top: 1px; color: var(--accent); }
+        .notice strong { font-weight: 600; }
+
+        /* Loading state on submit */
+        .spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.35);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Tab content show/hide */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        @media (max-width: 960px) {
+            .page { grid-template-columns: 1fr; }
+            .brand-pane { padding: 36px 28px; border-right: none; border-bottom: 1px solid var(--border); }
+            .auth-pane { padding: 36px 28px; }
+            .hero { margin: 36px 0 24px; }
+            .hero h2 { font-size: 28px; }
+            .feature-list { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+
+    <!-- LEFT — brand / hero -->
+    <section class="brand-pane">
+        <div class="brand-top">
+            <div class="brand-mark">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="0.6" y="0.6" width="46.8" height="46.8" rx="11" fill="#fff" stroke="#1e5b82" stroke-width="1.6"/>
+                    <path d="M 12 35 L 24 13 L 36 35" stroke="#1e5b82" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+                    <line x1="12" y1="35" x2="36" y2="35" stroke="#1e5b82" stroke-width="2.1" stroke-linecap="round"/>
+                    <circle cx="24" cy="35" r="2.4" fill="#1e5b82"/>
+                </svg>
+            </div>
+            <div class="brand-text">
+                <h1>Osteo<span class="brand-metron">Metron</span></h1>
+                <p>Učební nástroj pro plánování osteotomie</p>
+            </div>
+        </div>
+
+        <div class="hero">
+            <span class="eyebrow"><span class="eyebrow-dot"></span>Učební program · v1.0</span>
+            <h2>Učte se měřit a plánovat <em>osteotomie</em> přesně.</h2>
+            <p>OsteoMetron je výukový offline nástroj pro měření úhlů a plánování korekčních osteotomií na RTG snímcích. Určeno pro studenty medicíny a lékaře v rámci výukového kurzu.</p>
+
+            <ul class="feature-list">
+                <li>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4M4 20h16M4 20l8-10"/></svg>
+                    <div>Měření úhlů a anatomických os
+                        <span>LDFA, MDTA, vlastní úhly s kalibrací v mm</span>
+                    </div>
+                </li>
+                <li>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20L12 4l8 16M4 20h16"/></svg>
+                    <div>Plánování O/C wedge osteotomie
+                        <span>Interaktivní simulace s náhledem před / po operaci</span>
+                    </div>
+                </li>
+                <li>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg>
+                    <div>Plně offline a soukromé
+                        <span>Snímky neopouštějí váš prohlížeč</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="brand-footer">
+            <div class="meta">
+                <span class="version-tag">v1.0</span>
+                <a href="#">Dokumentace</a>
+                <a href="#">Kontakt</a>
+            </div>
+            <span>© 2026 OsteoMetron</span>
+        </div>
+    </section>
+
+    <!-- RIGHT — auth -->
+    <section class="auth-pane">
+        <div class="auth-top">
+            <div class="lang-switcher" aria-label="Přepínač jazyků">
+                <button class="lang-btn active" data-lang="cs">CZ</button>
+                <button class="lang-btn" data-lang="en">EN</button>
+                <button class="lang-btn" data-lang="de">DE</button>
+                <button class="lang-btn" data-lang="pl">PL</button>
+                <button class="lang-btn" data-lang="fr">FR</button>
+            </div>
+        </div>
+
+        <div class="auth-wrap">
+            <div class="auth-card">
+                <h3>Vítejte zpět</h3>
+                <p class="lead">Přihlaste se ke svému učebnímu účtu a pokračujte v práci se snímky.</p>
+
+                <div class="tabs" role="tablist">
+                    <button class="tab active" data-tab="login" role="tab">Přihlášení</button>
+                    <button class="tab" data-tab="register" role="tab">Registrace</button>
+                </div>
+
+                <!-- LOGIN -->
+                <form class="tab-panel active" id="panel-login" autocomplete="on">
+                    <div class="form-row">
+                        <label for="login-email">E-mail</label>
+                        <div class="input-wrap">
+                            <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 7 9-7"/></svg>
+                            <input id="login-email" type="email" placeholder="jmeno@univerzita.cz" required autocomplete="email">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label for="login-password">Heslo</label>
+                        <div class="input-wrap">
+                            <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                            <input id="login-password" type="password" placeholder="••••••••" required autocomplete="current-password">
+                            <button type="button" class="pw-toggle" aria-label="Zobrazit heslo" data-target="login-password">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="check"><input type="checkbox"> Zůstat přihlášen</label>
+                        <a href="#" class="forgot">Zapomenuté heslo?</a>
+                    </div>
+
+                    <button type="submit" class="submit" id="login-submit">
+                        <span>Přihlásit se</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                    </button>
+
+                    <div class="divider"><span>nebo</span></div>
+
+                    <div class="sso-row">
+                        <button type="button" class="sso-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18v14H3z"/><path d="M3 7l9 6 9-6"/></svg>
+                            <span>Univerzitní e-mail</span>
+                        </button>
+                        <button type="button" class="sso-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6v6H9z"/></svg>
+                            <span>SSO / Eduroam</span>
+                        </button>
+                    </div>
+
+                    <div class="notice">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
+                        <div><strong>Učební prostředí.</strong> Tento nástroj slouží výhradně k výukovým účelům a není určen pro klinické rozhodování.</div>
+                    </div>
+                </form>
+
+                <!-- REGISTER -->
+                <form class="tab-panel" id="panel-register" autocomplete="on">
+                    <div class="form-row">
+                        <label for="reg-name">Jméno a příjmení</label>
+                        <div class="input-wrap">
+                            <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+                            <input id="reg-name" type="text" placeholder="MUDr. Jan Novák" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="reg-email">Univerzitní / pracovní e-mail</label>
+                        <div class="input-wrap">
+                            <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 7 9-7"/></svg>
+                            <input id="reg-email" type="email" placeholder="jmeno@univerzita.cz" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="reg-password">Heslo</label>
+                        <div class="input-wrap">
+                            <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                            <input id="reg-password" type="password" placeholder="Min. 8 znaků" required>
+                            <button type="button" class="pw-toggle" data-target="reg-password" aria-label="Zobrazit heslo">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <label class="check" style="margin-bottom: 18px;">
+                        <input type="checkbox" required>
+                        <span>Souhlasím s <a href="#" style="color:var(--accent);">podmínkami</a> a <a href="#" style="color:var(--accent);">ochranou osobních údajů</a>.</span>
+                    </label>
+
+                    <button type="submit" class="submit">
+                        <span>Vytvořit účet</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                    </button>
+                </form>
+
+                <p class="legal">
+                    Pokračováním souhlasíte s pravidly výukového programu. Snímky zůstávají offline ve vašem prohlížeči.
+                </p>
+            </div>
+        </div>
+    </section>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://dicpotzftklyawjhrlph.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpY3BvdHpmdGtseWF3amhybHBoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMTgwMDEsImV4cCI6MjA5MjY5NDAwMX0.9D33gikSBrQI0Clg7U40HsNhNbsa4XfF9dnn6TmP1F4';
+        const { createClient } = supabase;
+        const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Pokud je už přihlášen, přesměruj rovnou
+        (async () => {
+            const { data: { session } } = await client.auth.getSession();
+            if (session) window.location.href = 'OsteoMetron v1.0.html';
+        })();
+
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab');
+        const panels = document.querySelectorAll('.tab-panel');
+        tabs.forEach(t => t.addEventListener('click', () => {
+            tabs.forEach(x => x.classList.remove('active'));
+            panels.forEach(p => p.classList.remove('active'));
+            t.classList.add('active');
+            document.getElementById('panel-' + t.dataset.tab).classList.add('active');
+        }));
+
+        // Language switcher (visual only)
+        const langs = document.querySelectorAll('.lang-btn');
+        langs.forEach(b => b.addEventListener('click', () => {
+            langs.forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+        }));
+
+        // Password visibility toggle
+        document.querySelectorAll('.pw-toggle').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const input = document.getElementById(btn.dataset.target);
+                input.type = input.type === 'password' ? 'text' : 'password';
+            });
+        });
+
+        // Zobrazit chybovou zprávu
+        function showError(panelId, msg) {
+            let el = document.getElementById(panelId + '-error');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = panelId + '-error';
+                el.style.cssText = 'background:var(--danger-soft);border:1px solid var(--danger);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--danger);margin-bottom:14px;';
+                document.getElementById('panel-' + panelId).prepend(el);
+            }
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        function hideError(panelId) {
+            const el = document.getElementById(panelId + '-error');
+            if (el) el.style.display = 'none';
+        }
+
+        function getErrorMsg(msg) {
+            if (msg.includes('Invalid login')) return 'Nesprávný e-mail nebo heslo.';
+            if (msg.includes('Email not confirmed')) return 'E-mail není potvrzen. Zkontrolujte schránku.';
+            if (msg.includes('Too many requests')) return 'Příliš mnoho pokusů. Zkuste za chvíli.';
+            if (msg.includes('User already registered')) return 'Účet s tímto e-mailem již existuje.';
+            return 'Operace se nezdařila. Zkuste to znovu.';
+        }
+
+        // LOGIN
+        document.getElementById('panel-login').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError('login');
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const submit = document.getElementById('login-submit');
+            submit.disabled = true;
+            submit.innerHTML = '<span class="spinner"></span><span>Přihlašuji…</span>';
+
+            const { data, error } = await client.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                showError('login', getErrorMsg(error.message));
+                submit.disabled = false;
+                submit.innerHTML = '<span>Přihlásit se</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+            } else {
+                submit.innerHTML = '<span>✓ Přihlášen…</span>';
+                window.location.href = 'OsteoMetron v1.0.html';
+            }
+        });
+
+        // REGISTER – zakázáno, jen admin může přidávat uživatele
+        document.getElementById('panel-register').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showError('register', 'Registrace je uzavřená. Kontaktujte administrátora pro přidělení přístupu.');
+        });
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch((err) => {
+                    console.warn('SW registration failed:', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
